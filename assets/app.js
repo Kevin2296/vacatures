@@ -1,136 +1,197 @@
-// Streamable IDs
-    const VIDEO1_ID = "c53lhh";
-    const VIDEO2_ID = "uwkejn";
+// === CONFIG ===
+const CONFIG = {
+  toName: "Kiki",
+  fromName: "Kevin",
+  video1: { id: "c53lhh", lengthSeconds: 8.0 },
+  video2: { id: "uwkejn", lengthSeconds: 15.04 },
+};
 
-    // Echte duur (jij gaf: 8s en 15.04s) + mini buffer
-    const PART1_LENGTH = 8.1;
-    const PART2_LENGTH = 15.2;
+// === ELEMENTS ===
+const start = document.getElementById("start");
+const env = document.getElementById("env");
+const loader = document.getElementById("loader");
+const player = document.getElementById("player");
+const frame = document.getElementById("frame");
+const which = document.getElementById("which");
 
-    const start = document.getElementById('start');
-    const env = document.getElementById('env');
-    const loader = document.getElementById('loader');
-    const player = document.getElementById('player');
-    const frame = document.getElementById('frame');
-    const banner = document.getElementById('banner');
-    const overlay = document.getElementById('overlay');
-    const end = document.getElementById('end');
-    const which = document.getElementById('which');
-    const hearts = document.getElementById('hearts');
+const overlay = document.getElementById("overlay");
+const modal = document.getElementById("modal");
+const end = document.getElementById("end");
+const particles = document.getElementById("particles");
 
-    let timers = [];
-    const sleep = (ms) => new Promise(r => setTimeout(r, ms));
+const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
+let timers = [];
 
-    function clearTimers(){ timers.forEach(t => clearTimeout(t)); timers = []; }
+function clearTimers() {
+  timers.forEach((t) => clearTimeout(t));
+  timers = [];
+}
 
-    function setVideo(id){
-      frame.src = `https://streamable.com/e/${id}?autoplay=1&hd=1`;
-    }
+function setVideo(id) {
+  frame.src = `https://streamable.com/e/${id}?autoplay=1&hd=1`;
+}
 
-    function requestFs(){
-      const el = document.getElementById('player');
-      const rfs = el.requestFullscreen || el.webkitRequestFullscreen || el.msRequestFullscreen;
-      if (rfs) { try { rfs.call(el); } catch(e) {} }
-    }
+function stopVideo() {
+  frame.src = "";
+}
 
-    function showPlayer(){
-      start.style.display = 'none';
-      player.classList.add('show');
-    }
+function requestFs() {
+  const el = player;
+  const rfs = el.requestFullscreen || el.webkitRequestFullscreen || el.msRequestFullscreen;
+  if (rfs) {
+    try { rfs.call(el); } catch (e) {}
+  }
+}
 
-    function hideModal(){
-      banner.classList.remove('show');
-      overlay.classList.remove('show');
-    }
-    function showModal(){
-      overlay.classList.add('show');
-      banner.classList.add('show');
-    }
+function showPlayer() {
+  start.style.display = "none";
+  player.classList.add("show");
+  player.setAttribute("aria-hidden", "false");
+}
 
-    function playPart1(){
-      clearTimers();
-      hideModal();
-      end.classList.remove('show');
-      which.textContent = "Deel 1";
-      setVideo(VIDEO1_ID);
-      showPlayer();
-      timers.push(setTimeout(() => showModal(), PART1_LENGTH * 1000));
-    }
+function showAfterPart1Modal() {
+  overlay.classList.add("show");
+  modal.classList.add("show");
+  overlay.setAttribute("aria-hidden", "false");
+  modal.setAttribute("aria-hidden", "false");
 
-    function playPart2(){
-      clearTimers();
-      hideModal();
-      end.classList.remove('show');
-      which.textContent = "Deel 2";
-      setVideo(VIDEO2_ID);
-      timers.push(setTimeout(() => end.classList.add('show'), PART2_LENGTH * 1000));
-    }
+  // tiny sparkle burst to emphasize "wow"
+  burstEmojis({ emojiList: ["✨","💛","✨"], count: 18, spread: 140, origin: "center" });
+}
 
-    function burstHearts(){
-      // cleanup
-      hearts.innerHTML = "";
-      const glyphs = ["💛","💥","✨","💛","💛","✨"];
-      const count = 26;
+function hideAfterPart1Modal() {
+  overlay.classList.remove("show");
+  modal.classList.remove("show");
+  overlay.setAttribute("aria-hidden", "true");
+  modal.setAttribute("aria-hidden", "true");
+}
 
-      for(let i=0;i<count;i++){
-        const s = document.createElement("span");
-        s.className = "heart";
-        s.textContent = glyphs[Math.floor(Math.random()*glyphs.length)];
+function playPart1() {
+  clearTimers();
+  hideAfterPart1Modal();
+  end.classList.remove("show");
+  end.setAttribute("aria-hidden", "true");
 
-        const dx = (Math.random()*2 - 1) * 260;         // -260..260 px
-        const dy = -(140 + Math.random()*320);           // -140..-460 px
-        const rot = (Math.random()*2 - 1) * 120;         // -120..120 deg
-        const dur = 650 + Math.random()*450;             // 650..1100 ms
-        const size = 18 + Math.random()*18;              // 18..36 px
+  which.textContent = "Deel 1";
+  setVideo(CONFIG.video1.id);
+  showPlayer();
 
-        s.style.setProperty("--dx", dx.toFixed(0) + "px");
-        s.style.setProperty("--dy", dy.toFixed(0) + "px");
-        s.style.setProperty("--rot", rot.toFixed(0) + "deg");
-        s.style.setProperty("--dur", dur.toFixed(0) + "ms");
-        s.style.fontSize = size.toFixed(0) + "px";
+  timers.push(setTimeout(showAfterPart1Modal, CONFIG.video1.lengthSeconds * 1000));
+}
 
-        // spreid startpunten een tikje rond het midden
-        const jitterX = (Math.random()*2 - 1) * 18;
-        const jitterY = (Math.random()*2 - 1) * 10;
-        s.style.left = `calc(50% + ${jitterX.toFixed(0)}px)`;
-        s.style.top  = `calc(55% + ${jitterY.toFixed(0)}px)`;
+function playPart2() {
+  clearTimers();
+  hideAfterPart1Modal();
+  end.classList.remove("show");
+  end.setAttribute("aria-hidden", "true");
 
-        hearts.appendChild(s);
-      }
-      // auto cleanup na anim
-      setTimeout(() => { hearts.innerHTML = ""; }, 1400);
-    }
+  which.textContent = "Deel 2";
+  setVideo(CONFIG.video2.id);
 
-    async function closeExperience(){
-      burstHearts();
-      // kleine fade-out feel
-      end.classList.remove('show');
-      hideModal();
-      await sleep(750);
+  timers.push(setTimeout(() => {
+    end.classList.add("show");
+    end.setAttribute("aria-hidden", "false");
+  }, CONFIG.video2.lengthSeconds * 1000));
+}
 
-      // stop video en terug naar start
-      frame.src = "";
-      player.classList.remove('show');
-      start.style.display = 'grid';
+function returnToStart() {
+  clearTimers();
+  hideAfterPart1Modal();
+  end.classList.remove("show");
+  end.setAttribute("aria-hidden", "true");
 
-      // reset envelope anim zodat je opnieuw kunt openen
-      env.classList.remove('opening');
-    }
+  player.classList.remove("show");
+  player.setAttribute("aria-hidden", "true");
+  stopVideo();
 
-    document.getElementById('openGift').addEventListener('click', async () => {
-      // envelope open animation + luxe “magie laden”
-      env.classList.add('opening');
-      loader.classList.add('show');
-      await sleep(1100);
-      loader.classList.remove('show');
+  start.style.display = "grid";
 
-      playPart1();
-      requestFs(); // best effort
-    });
+  // reset envelope animation for another run
+  env.classList.remove("opening");
+}
 
-    document.getElementById('replay1').addEventListener('click', playPart1);
-    document.getElementById('play2').addEventListener('click', playPart2);
-    document.getElementById('again').addEventListener('click', () => location.reload());
-    document.getElementById('closeEnd').addEventListener('click', closeExperience);
-    document.getElementById('fsBtn').addEventListener('click', requestFs);
+// === PARTICLE BURSTS ===
+function burstEmojis({ emojiList, count = 28, spread = 220, origin = "center" }) {
+  const rect = document.body.getBoundingClientRect();
+  const centerX = rect.width / 2;
+  const centerY = rect.height / 2;
 
-    // klik op overlay sluit de modal niet (bewust) — focus op "Open deel 2"
+  let x0 = centerX, y0 = centerY;
+
+  if (origin === "bottom") {
+    x0 = centerX;
+    y0 = rect.height * 0.78;
+  }
+
+  for (let i = 0; i < count; i++) {
+    const el = document.createElement("div");
+    el.className = "particle";
+    const emoji = emojiList[i % emojiList.length];
+    el.textContent = emoji;
+
+    const angle = Math.random() * Math.PI * 2;
+    const radius = (Math.random() * 0.6 + 0.4) * spread;
+    const dx = Math.cos(angle) * radius;
+    const dy = Math.sin(angle) * radius - (Math.random() * 60); // slightly upward bias
+
+    const rot = (Math.random() * 220 - 110).toFixed(0) + "deg";
+    const size = (Math.random() * 10 + 16).toFixed(0) + "px";
+
+    el.style.setProperty("--x", x0 + "px");
+    el.style.setProperty("--y", y0 + "px");
+    el.style.setProperty("--dx", dx.toFixed(1) + "px");
+    el.style.setProperty("--dy", dy.toFixed(1) + "px");
+    el.style.setProperty("--rot", rot);
+    el.style.fontSize = size;
+
+    // random delay gives more "explosion" feel
+    const delay = Math.random() * 80;
+    el.style.animation = `burst 900ms ease-out ${delay}ms forwards`;
+
+    particles.appendChild(el);
+    setTimeout(() => el.remove(), 1100 + delay);
+  }
+}
+
+function loveExplosion() {
+  // strong, romantic burst
+  burstEmojis({ emojiList: ["💛","💖","💞","✨","💛","💥"], count: 44, spread: 280, origin: "bottom" });
+}
+
+// === EVENTS ===
+document.getElementById("openGift").addEventListener("click", async () => {
+  env.classList.add("opening");
+  loader.classList.add("show");
+  loader.setAttribute("aria-hidden", "false");
+  await sleep(1050);
+  loader.classList.remove("show");
+  loader.setAttribute("aria-hidden", "true");
+
+  playPart1();
+  requestFs(); // best effort
+});
+
+document.getElementById("replay1").addEventListener("click", playPart1);
+document.getElementById("play2").addEventListener("click", playPart2);
+
+document.getElementById("again").addEventListener("click", () => {
+  burstEmojis({ emojiList: ["✨","💛","✨"], count: 22, spread: 160, origin: "center" });
+  setTimeout(returnToStart, 500);
+});
+
+document.getElementById("closeEnd").addEventListener("click", () => {
+  // Show love explosion BEFORE returning
+  loveExplosion();
+
+  // fade end a touch (visually)
+  end.style.transition = "opacity 220ms ease";
+  end.style.opacity = "0.2";
+
+  setTimeout(() => {
+    end.style.opacity = "";
+    end.style.transition = "";
+    returnToStart();
+  }, 900);
+});
+
+document.getElementById("fsBtn").addEventListener("click", requestFs);
