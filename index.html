@@ -22,19 +22,27 @@
     <div class="snow snow1"></div>
     <div class="snow snow2"></div>
     <div class="snow snow3"></div>
+    <div class="snow snow4"></div>
     <div class="lights"></div>
+    <div class="vignette"></div>
   </div>
 
-  <!-- Particles for wow -->
+  <!-- Hearts / sparkles / confetti -->
   <div class="particles" id="particles" aria-hidden="true"></div>
 
   <!-- START -->
   <main class="wrap" id="start">
     <section class="card">
-      <div class="envelope" id="env" aria-hidden="true">
-        <div class="flap"></div>
-        <div class="seal"></div>
-        <div class="shine"></div>
+      <!-- Gift icon -->
+      <div class="gift" id="env" aria-hidden="true">
+        <div class="gift-lid"></div>
+        <div class="gift-box"></div>
+        <div class="gift-ribbon-v"></div>
+        <div class="gift-ribbon-h"></div>
+        <div class="gift-bow">
+          <span></span><span></span>
+        </div>
+        <div class="gift-shine"></div>
       </div>
 
       <div class="badge">
@@ -100,6 +108,23 @@
         <div class="row">
           <button class="mini" id="again" type="button">Nog een keer</button>
           <button class="mini primary" id="closeEnd" type="button">Afsluiten <span aria-hidden="true">💥💛</span></button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Finale screen (after explosion) -->
+    <div class="finale" id="finale" aria-hidden="true">
+      <div class="finale-box">
+        <div class="finale-top">🎄✨</div>
+        <h3>Fijne kerstdagen, Kiki</h3>
+        <p>
+          Ik hoop dat dit je even liet glimlachen.<br>
+          Geniet van je cadeau. <span aria-hidden="true">💛</span>
+        </p>
+        <div class="sig">— Kevin</div>
+        <div class="row">
+          <button class="mini" id="finalRestart" type="button">Nog een keer 🎁</button>
+          <button class="mini primary" id="finalClose" type="button">Sluiten ✨</button>
         </div>
       </div>
     </div>
