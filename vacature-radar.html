@@ -6,10 +6,10 @@
   <title>Voor Kiki</title>
   <style>
     :root{
-      --bg:#07070a;
+      --bg:#06060a;
       --fg:#ffffff;
       --muted:rgba(255,255,255,.78);
-      --muted2:rgba(255,255,255,.58);
+      --muted2:rgba(255,255,255,.56);
       --gold1:#ffd38a;
       --gold2:#ff7a00;
       --card:rgba(255,255,255,.06);
@@ -18,25 +18,25 @@
     }
     html,body{height:100%;margin:0;background:var(--bg);color:var(--fg);font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial}
     *{box-sizing:border-box}
+    .safe{padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);}
 
-    /* Subtle animated background */
-    .bg {
+    /* Cinematic background */
+    .bg{
       position:fixed; inset:0; overflow:hidden; pointer-events:none;
       background:
         radial-gradient(900px 500px at 20% 10%, rgba(255,122,0,.18), transparent 60%),
         radial-gradient(700px 500px at 80% 30%, rgba(255,211,138,.14), transparent 60%),
         radial-gradient(1000px 800px at 50% 120%, rgba(255,122,0,.10), transparent 60%),
         linear-gradient(#050507, #09090f);
-      filter:saturate(1.1);
     }
     .stars{
       position:absolute; inset:-20%;
       background-image:
-        radial-gradient(2px 2px at 10% 20%, rgba(255,255,255,.45) 40%, transparent 42%),
-        radial-gradient(1px 1px at 30% 60%, rgba(255,255,255,.30) 40%, transparent 42%),
-        radial-gradient(1.5px 1.5px at 70% 30%, rgba(255,255,255,.35) 40%, transparent 42%),
-        radial-gradient(1px 1px at 85% 70%, rgba(255,255,255,.25) 40%, transparent 42%),
-        radial-gradient(2px 2px at 55% 80%, rgba(255,255,255,.20) 40%, transparent 42%);
+        radial-gradient(2px 2px at 10% 20%, rgba(255,255,255,.40) 40%, transparent 42%),
+        radial-gradient(1px 1px at 30% 60%, rgba(255,255,255,.28) 40%, transparent 42%),
+        radial-gradient(1.5px 1.5px at 70% 30%, rgba(255,255,255,.33) 40%, transparent 42%),
+        radial-gradient(1px 1px at 85% 70%, rgba(255,255,255,.22) 40%, transparent 42%),
+        radial-gradient(2px 2px at 55% 80%, rgba(255,255,255,.18) 40%, transparent 42%);
       opacity:.55;
       animation: drift 16s ease-in-out infinite alternate;
     }
@@ -44,8 +44,18 @@
       from{transform:translate3d(-1.5%, -1.0%, 0) scale(1)}
       to{transform:translate3d(1.5%, 1.0%, 0) scale(1.02)}
     }
+    .sparkles{
+      position:absolute; inset:0; opacity:.22;
+      background:
+        radial-gradient(2px 2px at 15% 35%, rgba(255,211,138,.9) 30%, transparent 35%),
+        radial-gradient(1px 1px at 65% 25%, rgba(255,122,0,.9) 30%, transparent 35%),
+        radial-gradient(2px 2px at 78% 62%, rgba(255,211,138,.75) 30%, transparent 35%),
+        radial-gradient(1px 1px at 40% 78%, rgba(255,122,0,.75) 30%, transparent 35%);
+      animation: twinkle 3.8s ease-in-out infinite;
+    }
+    @keyframes twinkle{ 0%,100%{opacity:.18} 50%{opacity:.30} }
 
-    /* Start screen */
+    /* Layout */
     .wrap{position:fixed; inset:0; display:grid; place-items:center; padding:24px}
     .card{
       width:min(560px, 100%);
@@ -57,26 +67,53 @@
       text-align:center;
       backdrop-filter: blur(10px);
     }
-    .badge{
-      display:inline-flex; gap:10px; align-items:center;
-      padding:10px 14px;
-      border-radius:999px;
+
+    /* Envelope animation */
+    .envelope{
+      width:140px; height:100px; margin:0 auto 14px; position:relative;
+      border-radius:18px;
       background:rgba(255,255,255,.06);
       border:1px solid rgba(255,255,255,.10);
-      margin-bottom:16px;
+      box-shadow:0 18px 55px rgba(0,0,0,.35);
+      overflow:hidden;
     }
-    .spark{
-      width:12px;height:12px;border-radius:4px;
+    .env-flap{
+      position:absolute; left:-10%; right:-10%; top:-55%;
+      height:120%;
+      background:linear-gradient(135deg, rgba(255,211,138,.22), rgba(255,122,0,.12));
+      transform-origin:50% 90%;
+      transform:rotateX(0deg);
+      border:1px solid rgba(255,255,255,.08);
+      border-bottom:none;
+      border-radius:22px;
+    }
+    .seal{
+      position:absolute; left:50%; top:58%;
+      transform:translate(-50%,-50%);
+      width:34px; height:34px; border-radius:12px;
       background:linear-gradient(135deg,var(--gold1),var(--gold2));
-      box-shadow:0 0 18px rgba(255,122,0,.55);
+      box-shadow:0 0 25px rgba(255,122,0,.45);
     }
-    h1{margin:6px 0 10px; font-size:30px; letter-spacing:.2px}
-    p{margin:0 0 18px; color:var(--muted); line-height:1.45; font-size:16px}
+    .opening .env-flap{ animation: openflap .65s ease forwards; }
+    @keyframes openflap{ from{transform:rotateX(0deg)} to{transform:rotateX(70deg)} }
 
-    .bigline{
-      margin:14px 0 18px;
+    .badge{
+      display:inline-flex; gap:10px; align-items:center;
+      padding:10px 14px; border-radius:999px;
+      background:rgba(255,255,255,.06);
+      border:1px solid rgba(255,255,255,.10);
+      margin:8px 0 14px;
+    }
+    .spark{width:12px;height:12px;border-radius:4px;background:linear-gradient(135deg,var(--gold1),var(--gold2));box-shadow:0 0 18px rgba(255,122,0,.55)}
+    h1{margin:2px 0 8px; font-size:30px; letter-spacing:.2px}
+    p{margin:0 0 14px; color:var(--muted); line-height:1.45; font-size:16px}
+
+    .type{
+      min-height:52px;
       font-size:15px;
       color:var(--muted2);
+      line-height:1.55;
+      margin:10px 0 18px;
     }
 
     .btn{
@@ -85,7 +122,7 @@
       border:0;
       border-radius:18px;
       font-size:18px;
-      font-weight:800;
+      font-weight:900;
       cursor:pointer;
       color:#120a00;
       background:linear-gradient(135deg,var(--gold1),var(--gold2));
@@ -97,31 +134,53 @@
     .hint{margin-top:10px; font-size:13px; color:rgba(255,255,255,.62)}
     .tiny{margin-top:14px; font-size:12px; color:rgba(255,255,255,.45)}
 
+    /* Loading overlay (after clicking gift) */
+    .loader{
+      position:fixed; inset:0; display:none; place-items:center;
+      background:rgba(0,0,0,.78);
+      backdrop-filter: blur(6px);
+      z-index:50;
+    }
+    .loader.show{display:grid; animation:fadein .35s ease both}
+    @keyframes fadein{from{opacity:0}to{opacity:1}}
+    .loadbox{
+      width:min(520px, 92%);
+      border-radius:26px;
+      background:rgba(255,255,255,.07);
+      border:1px solid rgba(255,255,255,.12);
+      box-shadow:var(--shadow);
+      padding:24px 20px;
+      text-align:center;
+    }
+    .loadtitle{font-weight:900; letter-spacing:.2px; margin:0 0 8px}
+    .loadsub{margin:0 0 14px; color:rgba(255,255,255,.72)}
+    .bar{height:10px; border-radius:999px; overflow:hidden; background:rgba(255,255,255,.10); border:1px solid rgba(255,255,255,.10)}
+    .bar > div{height:100%; width:0%; border-radius:999px; background:linear-gradient(90deg,var(--gold1),var(--gold2)); animation:fill 1.1s ease forwards}
+    @keyframes fill{to{width:100%}}
+
     /* Player overlay */
     .player{
       position:fixed; inset:0;
       display:none;
       background:#000;
+      z-index:40;
     }
     .player.show{display:block; animation:fadein .45s ease both}
-    @keyframes fadein{from{opacity:0}to{opacity:1}}
-
     .player iframe{
       position:absolute; inset:0;
       width:100%; height:100%;
       border:0;
       background:#000;
     }
-
-    /* Minimal top overlay (optional) */
     .topbar{
       position:absolute; left:0; right:0; top:0;
       padding:14px 14px;
       display:flex; justify-content:space-between; align-items:center;
       pointer-events:none;
       background:linear-gradient(to bottom, rgba(0,0,0,.55), transparent);
+      z-index:45;
     }
-    .topbar .chip{
+    .chip{
       pointer-events:auto;
       font-size:12px;
       padding:10px 12px;
@@ -131,50 +190,85 @@
       color:rgba(255,255,255,.85);
       backdrop-filter: blur(8px);
     }
-    .topbar button.chip{
-      cursor:pointer;
-    }
+    button.chip{cursor:pointer}
 
     /* End message */
     .end{
       position:absolute; inset:0;
-      display:none;
-      place-items:center;
+      display:none; place-items:center;
       text-align:center;
       padding:24px;
-      background:radial-gradient(900px 600px at 50% 20%, rgba(255,122,0,.18), transparent 60%), rgba(0,0,0,.65);
+      background:radial-gradient(900px 600px at 50% 20%, rgba(255,122,0,.18), transparent 60%), rgba(0,0,0,.68);
       backdrop-filter: blur(6px);
+      z-index:60;
     }
     .end.show{display:grid; animation:fadein .6s ease both}
     .end .box{
       width:min(520px, 100%);
       border-radius:26px;
-      background:rgba(255,255,255,.07);
+      background:rgba(255,255,255,.08);
       border:1px solid rgba(255,255,255,.12);
       box-shadow:var(--shadow);
       padding:26px 22px;
     }
     .end h2{margin:0 0 10px; font-size:24px}
     .end p{margin:0; color:rgba(255,255,255,.78); font-size:16px; line-height:1.5}
-    .sig{margin-top:14px; font-weight:800; letter-spacing:.2px}
-    canvas#confetti{position:fixed; inset:0; pointer-events:none}
+    .sig{margin-top:14px; font-weight:900; letter-spacing:.2px}
+    .row{display:flex; gap:10px; margin-top:16px}
+    .ghost{
+      flex:1;
+      padding:14px 14px;
+      border-radius:18px;
+      border:1px solid rgba(255,255,255,.18);
+      background:rgba(0,0,0,.25);
+      color:rgba(255,255,255,.86);
+      font-weight:800;
+      cursor:pointer;
+    }
+    .primary{
+      flex:1;
+      padding:14px 14px;
+      border-radius:18px;
+      border:0;
+      background:linear-gradient(135deg,var(--gold1),var(--gold2));
+      color:#120a00;
+      font-weight:900;
+      cursor:pointer;
+    }
+
+    /* Confetti canvas */
+    canvas#confetti{position:fixed; inset:0; pointer-events:none; z-index:70}
   </style>
 </head>
 
-<body>
-  <div class="bg"><div class="stars"></div></div>
+<body class="safe">
+  <div class="bg"><div class="stars"></div><div class="sparkles"></div></div>
   <canvas id="confetti"></canvas>
 
   <div class="wrap" id="start">
-    <div class="card">
+    <div class="card" id="card">
+      <div class="envelope" id="env">
+        <div class="env-flap"></div>
+        <div class="seal"></div>
+      </div>
+
       <div class="badge"><span class="spark"></span><span>Voor lieve Kiki</span></div>
       <h1>Ik heb iets voor je ✨</h1>
-      <p>Gewoon… omdat jij jij bent.</p>
-      <div class="bigline">Dankjewel dat je er bent. 💛</div>
+      <p>Een kleine verrassing… maar met een groot gevoel.</p>
+
+      <div class="type" id="type"></div>
 
       <button class="btn" id="openGift">Cadeau openen 🎁</button>
       <div class="hint">Tip: zet je geluid aan 🔊</div>
-      <div class="tiny">Als je op iPhone zit: tik eventueel op het ⛶ icoon in de player voor écht fullscreen.</div>
+      <div class="tiny">Op iPhone: als je écht fullscreen wil, tik in de video op ⛶.</div>
+    </div>
+  </div>
+
+  <div class="loader" id="loader">
+    <div class="loadbox">
+      <div class="loadtitle">✨ Even magie laden…</div>
+      <div class="loadsub">Dit duurt heel kort.</div>
+      <div class="bar"><div></div></div>
     </div>
   </div>
 
@@ -184,81 +278,119 @@
       <button class="chip" id="tryFullscreen" type="button">Fullscreen</button>
     </div>
 
-    <!-- Streamable embed fullscreen in viewport -->
+    <!-- Streamable supports query string options like autoplay=1 and hd=1 -->
     <iframe
       id="vid"
-      src="https://streamable.com/e/1mhpev"
+      src="https://streamable.com/e/1mhpev?autoplay=1&hd=1"
       allow="autoplay; fullscreen"
       allowfullscreen
     ></iframe>
 
-    <!-- End overlay (appears after X seconds) -->
     <div class="end" id="end">
       <div class="box">
         <h2>Dankjewel, Kiki 💛</h2>
         <p>
-          Echt. Dankjewel dat je er bent en dat jij… jij bent.<br/>
-          Ik hoop dat dit je even laat glimlachen.
+          Dankjewel dat je er bent.<br/>
+          En dat jij… gewoon jij bent.<br/><br/>
+          <b>Open je cadeau nu 💛</b>
         </p>
         <div class="sig">— Kevin</div>
+
+        <div class="row">
+          <button class="ghost" id="again">Nog een keer</button>
+          <button class="primary" id="closeEnd">Oké ✨</button>
+        </div>
       </div>
     </div>
   </div>
 
   <script>
-    // === SETTINGS ===
-    const SHOW_END_AFTER_SECONDS = 12; // pas aan naar de lengte van je video/reveal (bijv. 10-16)
+    // ====== SETTINGS ======
+    const SHOW_END_AFTER_SECONDS = 13; // zet dit gelijk aan (of net na) je videolengte/reveal
 
-    // Confetti (lightweight)
+    // ====== Typewriter lines ======
+    const lines = [
+      "Voor jou.",
+      "Dankjewel dat je er bent. 💛",
+      "Ik hoop dat dit je even laat glimlachen."
+    ];
+
+    const typeEl = document.getElementById('type');
+    const env = document.getElementById('env');
+    const card = document.getElementById('card');
+
+    function sleep(ms){ return new Promise(r => setTimeout(r, ms)); }
+
+    async function typeLines() {
+      // tiny envelope open animation
+      env.classList.add('opening');
+      await sleep(350);
+
+      typeEl.textContent = "";
+      for (let i=0; i<lines.length; i++){
+        const text = lines[i];
+        for (let j=0; j<=text.length; j++){
+          typeEl.textContent = lines.slice(0,i).join("\n") + (i>0 ? "\n" : "") + text.slice(0,j);
+          await sleep(22);
+        }
+        await sleep(320);
+      }
+    }
+    // start typing shortly after load
+    setTimeout(typeLines, 250);
+
+    // ====== Confetti burst (gold-ish, classy) ======
     const canvas = document.getElementById('confetti');
     const ctx = canvas.getContext('2d');
-    let W, H, pieces = [], confettiTimer = null;
-
     function resize(){
-      W = canvas.width = window.innerWidth * devicePixelRatio;
-      H = canvas.height = window.innerHeight * devicePixelRatio;
+      canvas.width = window.innerWidth * devicePixelRatio;
+      canvas.height = window.innerHeight * devicePixelRatio;
       ctx.setTransform(devicePixelRatio,0,0,devicePixelRatio,0,0);
     }
     window.addEventListener('resize', resize);
     resize();
 
+    let pieces = [];
     function burstConfetti(){
       pieces = [];
-      const count = 140;
+      const count = 160;
+      const cx = window.innerWidth/2, cy = window.innerHeight*0.38;
+
       for(let i=0;i<count;i++){
         pieces.push({
-          x: window.innerWidth/2,
-          y: window.innerHeight*0.40,
-          vx: (Math.random()*2-1) * (6 + Math.random()*6),
-          vy: (Math.random()*-1) * (10 + Math.random()*8),
-          g: 0.35 + Math.random()*0.25,
-          r: 2 + Math.random()*3,
+          x: cx, y: cy,
+          vx: (Math.random()*2-1) * (6 + Math.random()*7),
+          vy: (Math.random()*-1) * (10 + Math.random()*9),
+          g: 0.32 + Math.random()*0.28,
+          w: 2 + Math.random()*4,
+          h: 2 + Math.random()*5,
           a: 1,
           rot: Math.random()*Math.PI,
-          vr: (Math.random()*2-1)*0.2
+          vr: (Math.random()*2-1)*0.25
         });
       }
       const start = performance.now();
+
       function tick(t){
         ctx.clearRect(0,0,window.innerWidth,window.innerHeight);
-        pieces.forEach(p=>{
+        for (const p of pieces){
           p.vy += p.g;
           p.x += p.vx;
           p.y += p.vy;
           p.rot += p.vr;
           p.a *= 0.992;
+
           ctx.save();
           ctx.globalAlpha = Math.max(0, p.a);
           ctx.translate(p.x, p.y);
           ctx.rotate(p.rot);
-          // Don't set explicit colors? We'll keep it tasteful: use white/gold range via alpha only
-          // (browser will render default fillStyle black if unset; so set a neutral light)
-          ctx.fillStyle = 'rgba(255, 220, 160, 0.95)';
-          ctx.fillRect(-p.r, -p.r, p.r*2.2, p.r*1.1);
+          ctx.fillStyle = 'rgba(255, 210, 140, 0.95)';
+          ctx.fillRect(-p.w, -p.h, p.w*2.2, p.h*1.8);
           ctx.restore();
-        });
-        pieces = pieces.filter(p => p.y < window.innerHeight + 40 && p.a > 0.06);
-        if (t - start < 1100 && pieces.length){
+        }
+        pieces = pieces.filter(p => p.y < window.innerHeight + 60 && p.a > 0.06);
+
+        if (t - start < 1150 && pieces.length){
           requestAnimationFrame(tick);
         } else {
           ctx.clearRect(0,0,window.innerWidth,window.innerHeight);
@@ -267,7 +399,7 @@
       requestAnimationFrame(tick);
     }
 
-    // Fullscreen helper (works on many browsers; iOS Safari may ignore for iframes)
+    // ====== Fullscreen helper (best effort; iOS may ignore for non-video elements) ======
     function requestFs(){
       const el = document.getElementById('player');
       const rfs = el.requestFullscreen || el.webkitRequestFullscreen || el.msRequestFullscreen;
@@ -275,22 +407,31 @@
     }
 
     const start = document.getElementById('start');
+    const loader = document.getElementById('loader');
     const player = document.getElementById('player');
     const end = document.getElementById('end');
 
-    document.getElementById('openGift').addEventListener('click', () => {
+    document.getElementById('openGift').addEventListener('click', async () => {
       burstConfetti();
+
+      // show loading overlay briefly (adds “cinema” + hides any embed flicker)
+      loader.classList.add('show');
+      await sleep(1100);
+
+      loader.classList.remove('show');
       start.style.display = 'none';
       player.classList.add('show');
 
-      // Try to go fullscreen (best effort; iPhone might not allow)
+      // best-effort fullscreen
       requestFs();
 
-      // Show end message after X seconds (since we can't detect iframe end reliably)
+      // show end overlay after your chosen time (iframe end can't be detected reliably)
       setTimeout(() => end.classList.add('show'), SHOW_END_AFTER_SECONDS * 1000);
     });
 
     document.getElementById('tryFullscreen').addEventListener('click', () => requestFs());
+    document.getElementById('again').addEventListener('click', () => location.reload());
+    document.getElementById('closeEnd').addEventListener('click', () => end.classList.remove('show'));
   </script>
 </body>
 </html>
