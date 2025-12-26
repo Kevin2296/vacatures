@@ -4,6 +4,9 @@ const CONFIG = {
   fromName: "Kevin",
   video1: { id: "c53lhh", lengthSeconds: 8.0 },
   video2: { id: "uwkejn", lengthSeconds: 15.04 },
+
+  // Explosion timing
+  explosionDurationMs: 2200, // longer so you actually see it
 };
 
 // === ELEMENTS ===
@@ -17,6 +20,7 @@ const which = document.getElementById("which");
 const overlay = document.getElementById("overlay");
 const modal = document.getElementById("modal");
 const end = document.getElementById("end");
+const finale = document.getElementById("finale");
 const particles = document.getElementById("particles");
 
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
@@ -38,9 +42,7 @@ function stopVideo() {
 function requestFs() {
   const el = player;
   const rfs = el.requestFullscreen || el.webkitRequestFullscreen || el.msRequestFullscreen;
-  if (rfs) {
-    try { rfs.call(el); } catch (e) {}
-  }
+  if (rfs) { try { rfs.call(el); } catch (e) {} }
 }
 
 function showPlayer() {
@@ -56,7 +58,7 @@ function showAfterPart1Modal() {
   modal.setAttribute("aria-hidden", "false");
 
   // tiny sparkle burst to emphasize "wow"
-  burstEmojis({ emojiList: ["✨","💛","✨"], count: 18, spread: 140, origin: "center" });
+  burstEmojis({ emojiList: ["✨","💛","✨"], count: 22, spread: 160, origin: "center", durationMs: 1200 });
 }
 
 function hideAfterPart1Modal() {
@@ -66,9 +68,25 @@ function hideAfterPart1Modal() {
   modal.setAttribute("aria-hidden", "true");
 }
 
+function showFinale() {
+  finale.classList.add("show");
+  finale.setAttribute("aria-hidden", "false");
+
+  // keep it festive: small continuing sparkles
+  burstEmojis({ emojiList: ["✨","💛","✨","🎄"], count: 26, spread: 180, origin: "center", durationMs: 1500 });
+  setTimeout(() => burstEmojis({ emojiList: ["💛","✨","💖"], count: 22, spread: 160, origin: "center", durationMs: 1400 }), 700);
+}
+
+function hideFinale() {
+  finale.classList.remove("show");
+  finale.setAttribute("aria-hidden", "true");
+}
+
 function playPart1() {
   clearTimers();
   hideAfterPart1Modal();
+  hideFinale();
+
   end.classList.remove("show");
   end.setAttribute("aria-hidden", "true");
 
@@ -82,6 +100,8 @@ function playPart1() {
 function playPart2() {
   clearTimers();
   hideAfterPart1Modal();
+  hideFinale();
+
   end.classList.remove("show");
   end.setAttribute("aria-hidden", "true");
 
@@ -97,6 +117,8 @@ function playPart2() {
 function returnToStart() {
   clearTimers();
   hideAfterPart1Modal();
+  hideFinale();
+
   end.classList.remove("show");
   end.setAttribute("aria-hidden", "true");
 
@@ -106,36 +128,31 @@ function returnToStart() {
 
   start.style.display = "grid";
 
-  // reset envelope animation for another run
+  // reset gift animation for another run
   env.classList.remove("opening");
 }
 
 // === PARTICLE BURSTS ===
-function burstEmojis({ emojiList, count = 28, spread = 220, origin = "center" }) {
+function burstEmojis({ emojiList, count = 30, spread = 240, origin = "center", durationMs = 1600 }) {
   const rect = document.body.getBoundingClientRect();
   const centerX = rect.width / 2;
   const centerY = rect.height / 2;
 
   let x0 = centerX, y0 = centerY;
-
-  if (origin === "bottom") {
-    x0 = centerX;
-    y0 = rect.height * 0.78;
-  }
+  if (origin === "bottom") { y0 = rect.height * 0.78; }
 
   for (let i = 0; i < count; i++) {
     const el = document.createElement("div");
     el.className = "particle";
-    const emoji = emojiList[i % emojiList.length];
-    el.textContent = emoji;
+    el.textContent = emojiList[i % emojiList.length];
 
     const angle = Math.random() * Math.PI * 2;
     const radius = (Math.random() * 0.6 + 0.4) * spread;
     const dx = Math.cos(angle) * radius;
-    const dy = Math.sin(angle) * radius - (Math.random() * 60); // slightly upward bias
+    const dy = Math.sin(angle) * radius - (Math.random() * 90); // more upward feel
 
-    const rot = (Math.random() * 220 - 110).toFixed(0) + "deg";
-    const size = (Math.random() * 10 + 16).toFixed(0) + "px";
+    const rot = (Math.random() * 240 - 120).toFixed(0) + "deg";
+    const size = (Math.random() * 12 + 18).toFixed(0) + "px";
 
     el.style.setProperty("--x", x0 + "px");
     el.style.setProperty("--y", y0 + "px");
@@ -144,18 +161,18 @@ function burstEmojis({ emojiList, count = 28, spread = 220, origin = "center" })
     el.style.setProperty("--rot", rot);
     el.style.fontSize = size;
 
-    // random delay gives more "explosion" feel
-    const delay = Math.random() * 80;
-    el.style.animation = `burst 900ms ease-out ${delay}ms forwards`;
+    const delay = Math.random() * 110;
+    el.style.animation = `burst ${durationMs}ms ease-out ${delay}ms forwards`;
 
     particles.appendChild(el);
-    setTimeout(() => el.remove(), 1100 + delay);
+    setTimeout(() => el.remove(), durationMs + delay + 250);
   }
 }
 
 function loveExplosion() {
-  // strong, romantic burst
-  burstEmojis({ emojiList: ["💛","💖","💞","✨","💛","💥"], count: 44, spread: 280, origin: "bottom" });
+  // 2 waves = bigger impact
+  burstEmojis({ emojiList: ["💛","💖","💞","✨","💛","💥"], count: 60, spread: 320, origin: "bottom", durationMs: 2000 });
+  setTimeout(() => burstEmojis({ emojiList: ["💛","✨","💖","💞"], count: 44, spread: 260, origin: "bottom", durationMs: 1800 }), 260);
 }
 
 // === EVENTS ===
@@ -175,23 +192,35 @@ document.getElementById("replay1").addEventListener("click", playPart1);
 document.getElementById("play2").addEventListener("click", playPart2);
 
 document.getElementById("again").addEventListener("click", () => {
-  burstEmojis({ emojiList: ["✨","💛","✨"], count: 22, spread: 160, origin: "center" });
-  setTimeout(returnToStart, 500);
+  burstEmojis({ emojiList: ["✨","💛","✨"], count: 26, spread: 180, origin: "center", durationMs: 1400 });
+  setTimeout(returnToStart, 650);
 });
 
 document.getElementById("closeEnd").addEventListener("click", () => {
-  // Show love explosion BEFORE returning
+  // Love explosion, then go to finale instead of immediately back to start
   loveExplosion();
 
-  // fade end a touch (visually)
-  end.style.transition = "opacity 220ms ease";
-  end.style.opacity = "0.2";
+  end.style.transition = "opacity 240ms ease";
+  end.style.opacity = "0.15";
 
   setTimeout(() => {
     end.style.opacity = "";
     end.style.transition = "";
-    returnToStart();
-  }, 900);
+    end.classList.remove("show");
+    end.setAttribute("aria-hidden", "true");
+    showFinale();
+  }, 700);
+});
+
+document.getElementById("finalRestart").addEventListener("click", () => {
+  burstEmojis({ emojiList: ["✨","💛","🎁"], count: 34, spread: 220, origin: "center", durationMs: 1500 });
+  setTimeout(returnToStart, 850);
+});
+
+document.getElementById("finalClose").addEventListener("click", () => {
+  // one last mini burst then back to start
+  burstEmojis({ emojiList: ["💛","✨","🎄"], count: 28, spread: 200, origin: "center", durationMs: 1500 });
+  setTimeout(returnToStart, 900);
 });
 
 document.getElementById("fsBtn").addEventListener("click", requestFs);
