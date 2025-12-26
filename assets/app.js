@@ -1,4 +1,4 @@
-// v7: gift icon matches iOS-ish + explosions on ALL buttons + bigger finale bang
+// v8: smoother transitions (delay video swap so bursts can render) + fixed mobile 'open' after restart + better gift easter egg
 const CONFIG = {
   video1: { id: "c53lhh", lengthSeconds: 8.0 },
   video2: { id: "uwkejn", lengthSeconds: 15.04 },
@@ -7,6 +7,9 @@ const CONFIG = {
 // Elements
 const start = document.getElementById("start");
 const loader = document.getElementById("loader");
+const loadTitle = document.getElementById("loadTitle");
+const loadSub = document.getElementById("loadSub");
+
 const player = document.getElementById("player");
 const frame = document.getElementById("frame");
 const which = document.getElementById("which");
@@ -23,8 +26,19 @@ const flash = document.getElementById("flash");
 const giftIcon = document.getElementById("giftIcon");
 const openBtn = document.getElementById("openGift");
 
+const btnReplay1 = document.getElementById("replay1");
+const btnPlay2 = document.getElementById("play2");
+const btnAgain = document.getElementById("again");
+const btnCloseEnd = document.getElementById("closeEnd");
+const btnFinalRestart = document.getElementById("finalRestart");
+const btnFinalClose = document.getElementById("finalClose");
+const btnClosedBack = document.getElementById("closedBack");
+const btnClosedTryClose = document.getElementById("closedTryClose");
+const btnFs = document.getElementById("fsBtn");
+
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 let timers = [];
+let busy = false;
 
 function clearTimers() { timers.forEach((t) => clearTimeout(t)); timers = []; }
 
@@ -42,15 +56,25 @@ function showPlayer() {
   player.setAttribute("aria-hidden", "false");
 }
 
+function showLoader(title, sub) {
+  loadTitle.textContent = title;
+  loadSub.textContent = sub;
+  loader.classList.add("show");
+  loader.setAttribute("aria-hidden", "false");
+}
+function hideLoader() {
+  loader.classList.remove("show");
+  loader.setAttribute("aria-hidden", "true");
+}
+
 function showAfterPart1Modal() {
   overlay.classList.add("show");
   modal.classList.add("show");
   overlay.setAttribute("aria-hidden", "false");
   modal.setAttribute("aria-hidden", "false");
 
-  // Make it obvious
   doFlash();
-  burstAtViewportCenter(["✨","💛","✨"], 48, 230, 1700);
+  burstAtViewportCenter(["✨","💛","✨"], 52, 240, 1800);
 }
 
 function hideAfterPart1Modal() {
@@ -64,7 +88,7 @@ function showFinale() {
   finale.classList.add("show");
   finale.setAttribute("aria-hidden", "false");
   doFlash();
-  burstAtViewportCenter(["🎄","✨","💛"], 52, 260, 1800);
+  burstAtViewportCenter(["🎄","✨","💛"], 56, 280, 1900);
 }
 function hideFinale() {
   finale.classList.remove("show");
@@ -94,7 +118,7 @@ function playPart1() {
   timers.push(setTimeout(showAfterPart1Modal, CONFIG.video1.lengthSeconds * 1000));
 }
 
-function playPart2() {
+function playPart2_startVideoNow() {
   clearTimers();
   hideAfterPart1Modal();
   hideFinale();
@@ -109,8 +133,16 @@ function playPart2() {
     end.classList.add("show");
     end.setAttribute("aria-hidden", "false");
     doFlash();
-    burstAtViewportCenter(["💛","✨","💖"], 46, 240, 1700);
+    burstAtViewportCenter(["💛","✨","💖"], 52, 280, 1900);
   }, CONFIG.video2.lengthSeconds * 1000));
+}
+
+// IMPORTANT: let bursts render BEFORE heavy iframe swap
+async function playPart2_smooth() {
+  showLoader("✨ Deel 2 openen…", "Nog heel even…");
+  await sleep(520);
+  hideLoader();
+  playPart2_startVideoNow();
 }
 
 function returnToStart() {
@@ -127,13 +159,18 @@ function returnToStart() {
   stopVideo();
 
   start.style.display = "grid";
-  giftIcon.classList.remove("pop");
+
+  // Reset gift state
+  giftIcon.classList.remove("open");
+
+  // Re-enable button + allow new run
+  openBtn.disabled = false;
+  busy = false;
 }
 
 // FX helpers
 function doFlash() {
   flash.classList.remove("show");
-  // force reflow so animation restarts
   void flash.offsetWidth;
   flash.classList.add("show");
   setTimeout(() => flash.classList.remove("show"), 900);
@@ -164,7 +201,7 @@ function burstAt(x0, y0, emojiList, count = 40, spread = 240, durationMs = 1700)
     el.style.animation = `burst ${durationMs}ms ease-out ${delay}ms forwards`;
 
     particles.appendChild(el);
-    setTimeout(() => el.remove(), durationMs + delay + 250);
+    setTimeout(() => el.remove(), durationMs + delay + 260);
   }
 }
 
@@ -172,122 +209,177 @@ function burstAtViewportCenter(emojiList, count, spread, durationMs) {
   burstAt(window.innerWidth / 2, window.innerHeight / 2, emojiList, count, spread, durationMs);
 }
 
-function burstFromEvent(ev, emojiList, count = 36, spread = 200, durationMs = 1600) {
-  const x = ev.clientX ?? (ev.touches && ev.touches[0]?.clientX) ?? window.innerWidth/2;
-  const y = ev.clientY ?? (ev.touches && ev.touches[0]?.clientY) ?? window.innerHeight/2;
+function burstFromButton(btn, emojiList, count = 36, spread = 210, durationMs = 1700) {
+  if (!btn) return;
+  const r = btn.getBoundingClientRect();
+  const x = r.left + r.width / 2;
+  const y = r.top + r.height / 2;
   burstAt(x, y, emojiList, count, spread, durationMs);
   doFlash();
 }
 
 function loveExplosionBig() {
-  // 3 big waves => impossible to miss
   doFlash();
-  burstAt(window.innerWidth/2, window.innerHeight*0.74, ["💛","💖","💞","✨","💥"], 95, 380, 2600);
-  setTimeout(() => burstAt(window.innerWidth/2, window.innerHeight*0.74, ["💛","✨","💖","💞"], 80, 340, 2400), 240);
-  setTimeout(() => burstAt(window.innerWidth/2, window.innerHeight*0.74, ["✨","💛","💥"], 70, 300, 2200), 540);
+  const x = window.innerWidth/2;
+  const y = window.innerHeight*0.74;
+  burstAt(x, y, ["💛","💖","💞","✨","💥"], 105, 420, 2800);
+  setTimeout(() => burstAt(x, y, ["💛","✨","💖","💞"], 90, 380, 2600), 250);
+  setTimeout(() => burstAt(x, y, ["✨","💛","💥"], 80, 340, 2400), 560);
 }
 
-// Gift easter egg: pop + burst from gift center
+// Gift easter egg: lid opens + burst from gift
 function giftEasterEgg() {
-  giftIcon.classList.add("pop");
-  setTimeout(() => giftIcon.classList.remove("pop"), 600);
+  giftIcon.classList.add("open");
+  setTimeout(() => giftIcon.classList.remove("open"), 980);
 
   const r = giftIcon.getBoundingClientRect();
   const x0 = r.left + r.width / 2;
   const y0 = r.top + r.height / 2;
-  burstAt(x0, y0, ["🎁","✨","💛","🎄"], 52, 260, 1900);
+  burstAt(x0, y0, ["🎁","✨","💛","🎄"], 62, 280, 2000);
   doFlash();
 }
 
-// Small "click bursts" on buttons (so it feels alive)
-function attachBurst(button, emojiList) {
+// Button FX: do it on CLICK (mobile-safe, always fires)
+function attachClickBurst(button, emojiList) {
   if (!button) return;
-  button.addEventListener("pointerdown", (ev) => burstFromEvent(ev, emojiList, 34, 190, 1500), { passive: true });
+  button.addEventListener("click", () => burstFromButton(button, emojiList), { passive: true });
 }
 
 // Attach bursts to all key buttons
-attachBurst(openBtn, ["🎁","✨","💛"]);
-attachBurst(document.getElementById("replay1"), ["✨","✨","💛"]);
-attachBurst(document.getElementById("play2"), ["🎁","💛","✨"]);
-attachBurst(document.getElementById("again"), ["✨","💛","🎁"]);
-attachBurst(document.getElementById("closeEnd"), ["💥","💛","💖","✨"]);
-attachBurst(document.getElementById("finalRestart"), ["🎁","✨","💛"]);
-attachBurst(document.getElementById("finalClose"), ["💥","💛","✨"]);
-attachBurst(document.getElementById("closedBack"), ["✨","💛"]);
-attachBurst(document.getElementById("closedTryClose"), ["✨","💛","💥"]);
-attachBurst(document.getElementById("fsBtn"), ["✨","💛"]);
+attachClickBurst(openBtn, ["🎁","✨","💛"]);
+attachClickBurst(btnReplay1, ["✨","💛","✨"]);
+attachClickBurst(btnPlay2, ["🎁","💛","✨"]);
+attachClickBurst(btnAgain, ["✨","💛","🎁"]);
+attachClickBurst(btnCloseEnd, ["💥","💛","💖","✨"]);
+attachClickBurst(btnFinalRestart, ["🎁","✨","💛"]);
+attachClickBurst(btnFinalClose, ["💥","💛","✨"]);
+attachClickBurst(btnClosedBack, ["✨","💛"]);
+attachClickBurst(btnClosedTryClose, ["✨","💛","💥"]);
+attachClickBurst(btnFs, ["✨","💛"]);
 
 // Events
 openBtn.addEventListener("click", async () => {
+  if (busy) return;
+  busy = true;
+  openBtn.disabled = true;
+
   giftEasterEgg();
-  loader.classList.add("show");
-  loader.setAttribute("aria-hidden", "false");
+  showLoader("✨ Even magie laden…", "Dit duurt heel kort.");
   await sleep(1050);
-  loader.classList.remove("show");
-  loader.setAttribute("aria-hidden", "true");
+  hideLoader();
 
   playPart1();
   requestFs();
 });
 
-document.getElementById("replay1").addEventListener("click", () => {
-  doFlash();
-  burstAtViewportCenter(["✨","💛"], 30, 220, 1600);
+btnReplay1.addEventListener("click", async () => {
+  if (busy) return;
+  busy = true;
+  btnReplay1.disabled = true;
+  showLoader("✨ Terugspoelen…", "Nog heel even…");
+  await sleep(420);
+  hideLoader();
+  btnReplay1.disabled = false;
+  busy = false;
   playPart1();
 });
 
-document.getElementById("play2").addEventListener("click", () => {
-  doFlash();
-  burstAtViewportCenter(["🎁","💛","✨"], 42, 240, 1700);
-  playPart2();
+btnPlay2.addEventListener("click", async () => {
+  if (busy) return;
+
+  // make it feel smooth: hide modal, show a micro-loader, THEN swap iframe
+  busy = true;
+  btnPlay2.disabled = true;
+  hideAfterPart1Modal();
+
+  await playPart2_smooth();
+
+  btnPlay2.disabled = false;
+  busy = false;
 });
 
-document.getElementById("again").addEventListener("click", () => {
-  doFlash();
-  burstAtViewportCenter(["✨","💛","🎁"], 42, 260, 1800);
-  setTimeout(returnToStart, 850);
+btnAgain.addEventListener("click", async () => {
+  if (busy) return;
+  busy = true;
+  btnAgain.disabled = true;
+
+  showLoader("✨ Nog een keer…", "Even resetten…");
+  await sleep(520);
+  hideLoader();
+
+  // Now safe reset (fixes the 'open does nothing' iPhone issue)
+  btnAgain.disabled = false;
+  returnToStart();
 });
 
-document.getElementById("closeEnd").addEventListener("click", () => {
-  // Strong love-bomb and keep it long enough
+btnCloseEnd.addEventListener("click", async () => {
+  if (busy) return;
+  busy = true;
+  btnCloseEnd.disabled = true;
+
   loveExplosionBig();
 
   end.style.transition = "opacity 260ms ease";
-  end.style.opacity = "0.08";
+  end.style.opacity = "0.10";
 
-  // WAIT longer so it feels like a real finale
-  setTimeout(() => {
-    end.style.opacity = "";
-    end.style.transition = "";
-    end.classList.remove("show");
-    end.setAttribute("aria-hidden", "true");
-    showFinale();
-  }, 2100);
+  // Give the bomb TIME
+  await sleep(2350);
+
+  end.style.opacity = "";
+  end.style.transition = "";
+  end.classList.remove("show");
+  end.setAttribute("aria-hidden", "true");
+
+  btnCloseEnd.disabled = false;
+  busy = false;
+  showFinale();
 });
 
-document.getElementById("finalRestart").addEventListener("click", () => {
-  doFlash();
-  burstAtViewportCenter(["🎁","✨","💛"], 50, 280, 1900);
-  setTimeout(returnToStart, 950);
+btnFinalRestart.addEventListener("click", async () => {
+  if (busy) return;
+  busy = true;
+  btnFinalRestart.disabled = true;
+
+  showLoader("🎁 Opnieuw…", "Even terug…");
+  await sleep(520);
+  hideLoader();
+
+  btnFinalRestart.disabled = false;
+  returnToStart();
 });
 
-document.getElementById("finalClose").addEventListener("click", () => {
+btnFinalClose.addEventListener("click", async () => {
+  if (busy) return;
+  busy = true;
+  btnFinalClose.disabled = true;
+
   loveExplosionBig();
-  setTimeout(() => {
-    hideFinale();
-    showClosed();
-  }, 1200);
+  await sleep(1500);
+
+  hideFinale();
+  showClosed();
+
+  btnFinalClose.disabled = false;
+  busy = false;
 });
 
-document.getElementById("closedBack").addEventListener("click", () => {
-  doFlash();
-  burstAtViewportCenter(["✨","💛"], 34, 220, 1600);
-  setTimeout(returnToStart, 750);
+btnClosedBack.addEventListener("click", async () => {
+  if (busy) return;
+  busy = true;
+  btnClosedBack.disabled = true;
+
+  showLoader("✨ Terug…", "Heel even…");
+  await sleep(420);
+  hideLoader();
+
+  btnClosedBack.disabled = false;
+  returnToStart();
 });
 
-document.getElementById("closedTryClose").addEventListener("click", () => {
+btnClosedTryClose.addEventListener("click", async () => {
   loveExplosionBig();
-  setTimeout(() => { try { window.close(); } catch (e) {} }, 250);
+  await sleep(250);
+  try { window.close(); } catch (e) {}
 });
 
-document.getElementById("fsBtn").addEventListener("click", requestFs);
+btnFs.addEventListener("click", requestFs);
