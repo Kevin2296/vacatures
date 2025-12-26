@@ -1,3 +1,21 @@
+// v9 hotfix: prevent GitHub Pages/service-worker caching issues + handle bfcache on iOS/Chrome
+(function(){
+  try{
+    // If this domain previously had a service worker (e.g., from another project),
+    // it can cache stale files and break buttons. Unregister any SW to avoid that.
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.getRegistrations()
+        .then(function(regs){ regs.forEach(function(r){ try{ r.unregister(); }catch(e){} }); })
+        .catch(function(){});
+    }
+    // If page is restored from back-forward cache, force a clean reload.
+    window.addEventListener('pageshow', function(e){
+      if (e && e.persisted) { try{ location.reload(); }catch(_){} }
+    });
+  }catch(e){}
+})();
+
+
 // v8: smoother transitions (delay video swap so bursts can render) + fixed mobile 'open' after restart + better gift easter egg
 const CONFIG = {
   video1: { id: "c53lhh", lengthSeconds: 8.0 },
@@ -242,7 +260,7 @@ function giftEasterEgg() {
 // Button FX: do it on CLICK (mobile-safe, always fires)
 function attachClickBurst(button, emojiList) {
   if (!button) return;
-  button.addEventListener("click", () => burstFromButton(button, emojiList), { passive: true });
+  button.addEventListener("click", () => burstFromButton(button, emojiList));
 }
 
 // Attach bursts to all key buttons
