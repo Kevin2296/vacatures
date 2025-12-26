@@ -1,15 +1,14 @@
-# Kiki Surprise Site ✨🎁 (v6)
+# Kiki Surprise Site ✨🎁 (v7)
 
-Fixes:
-- Finale-knoppen werkten niet (CSS overlay blokkeerde clicks) ✅
-- Afsluiten → grotere/langer zichtbare liefdes-explosie ✅
-- Gift “easter egg”: pop + confetti bij openen ✅
-- Extra “Closed” scherm met uitleg (tabs kun je niet altijd automatisch sluiten) ✅
+## Wat is dat bolletje in “Voor de allerliefste Kiki”?
+Dat is puur een luxe accent (een “gloed/spark”) zodat de badge wat levendiger oogt.
+In v7 pulseert het subtiel. Wil je het weg? In `index.html` haal je `<span class="spark"></span>` weg.
 
 ## Video’s aanpassen
 In `assets/app.js`:
 - `CONFIG.video1.id` + `CONFIG.video1.lengthSeconds`
 - `CONFIG.video2.id` + `CONFIG.video2.lengthSeconds`
 
-## Cache tip
-Hard refresh (Ctrl+Shift+R) of incognito.
+## iPhone / tab sluiten
+Mobiele browsers laten websites meestal niet automatisch tabs sluiten.
+Daarom tonen we na “Sluiten” een nette eindkaart met uitleg.
