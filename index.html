@@ -1,0 +1,107 @@
+<!doctype html>
+<html lang="nl">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
+  <meta name="theme-color" content="#0b0b12" />
+  <meta name="color-scheme" content="dark" />
+  <title>Voor Kiki ✨</title>
+
+  <!-- Social preview (optioneel): vervang assets/og.png als je wil -->
+  <meta property="og:title" content="Voor Kiki ✨" />
+  <meta property="og:description" content="Ik heb iets voor je…" />
+  <meta property="og:type" content="website" />
+  <meta property="og:image" content="assets/og.png" />
+
+  <link rel="icon" href="assets/favicon.svg" type="image/svg+xml" />
+  <link rel="stylesheet" href="assets/style.css" />
+</head>
+
+<body>
+  <!-- Background layers -->
+  <div class="bg" aria-hidden="true">
+    <div class="stars"></div>
+    <div class="glitter"></div>
+    <div class="snow"></div>
+  </div>
+
+  <!-- Confetti canvas -->
+  <canvas id="confetti" aria-hidden="true"></canvas>
+
+  <!-- START -->
+  <main class="wrap" id="start" role="main">
+    <section class="card" aria-label="Start">
+      <div class="envelope" id="env" aria-hidden="true">
+        <div class="flap"></div>
+        <div class="letter"></div>
+        <div class="seal"><span class="sealMark">K</span></div>
+      </div>
+
+      <div class="badge">
+        <span class="spark" aria-hidden="true"></span>
+        <span>Voor de allerliefste <span id="toName">Kiki</span></span>
+      </div>
+
+      <h1>Ik heb iets voor je ✨</h1>
+      <p>Een luxe kleine verrassing… omdat jij jij bent.</p>
+      <div class="bigline">
+        Dankjewel dat je er bent. 💛<br>
+        Tip: zet je geluid aan 🔊
+      </div>
+
+      <button class="btn" id="openGift" type="button">Open de verrassing 🎁</button>
+
+      <div class="hint">iPhone tip: voor écht fullscreen tik je in de video op het ⛶-icoontje.</div>
+      <div class="tiny">Na deel 1 verschijnt: “maak het cadeau open”.</div>
+    </section>
+  </main>
+
+  <!-- LOADER -->
+  <div class="loader" id="loader" role="dialog" aria-modal="true" aria-label="Laden">
+    <div class="loadbox">
+      <div class="loadtitle">✨ Even magie laden…</div>
+      <div class="loadsub">Dit duurt heel kort.</div>
+      <div class="bar"><div></div></div>
+    </div>
+  </div>
+
+  <!-- PLAYER -->
+  <section class="player" id="player" aria-label="Video speler">
+    <div class="top">
+      <div class="chip">Voor <span id="chipName">Kiki</span> ✨</div>
+      <div class="topRight">
+        <button class="chip btnChip" id="fsBtn" type="button">Fullscreen</button>
+        <div class="chip" id="which">Deel 1</div>
+      </div>
+    </div>
+
+    <iframe id="frame" title="Video" src="" allow="autoplay; fullscreen; picture-in-picture" allowfullscreen></iframe>
+
+    <div class="banner" id="banner" role="dialog" aria-modal="false" aria-label="Ga door naar deel 2">
+      <h2>Maak nu het cadeau open 🎁</h2>
+      <p>Oké… klaar? Druk dan op deel 2. 💛</p>
+      <div class="row">
+        <button class="mini" id="replay1" type="button">Nog eens ✨</button>
+        <button class="mini primary" id="play2" type="button">Open deel 2 💛</button>
+      </div>
+    </div>
+
+    <div class="end" id="end" role="dialog" aria-modal="true" aria-label="Einde">
+      <div class="box">
+        <h3>Dankjewel, <span id="endName">Kiki</span> 💛</h3>
+        <p>
+          Dankjewel dat je er bent.<br>
+          En dat jij… gewoon jij bent.
+        </p>
+        <div class="sig">— <span id="fromName">Kevin</span></div>
+        <div class="row endRow">
+          <button class="mini" id="again" type="button">Nog een keer</button>
+          <button class="mini primary" id="closeEnd" type="button">Oké ✨</button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <script defer src="assets/app.js"></script>
+</body>
+</html>
